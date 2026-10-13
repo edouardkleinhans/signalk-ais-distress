@@ -42,6 +42,20 @@ SIGNALK_TOKEN=<jwt> npm run clear-ais -- --broadcast distress
 - **Resource providers**: `ais-distress` (history) and `ais-distress-markers` (chart layer, bucketed by device).
 - **Optional logbook**: writes via `signalk-logbook` if `logbookToken` configured.
 
+## Logbook integration (signalk-logbook v2 Resources API)
+
+Prefers the SignalK v2 Resources API (`app.resourcesApi.setResource`) over the legacy
+plugin REST API — no separate URL or cookie handling when the SignalK app provides
+`resourcesApi`.
+
+- **Default**: v2 Resources API (`/signalk/v2/api/resources/logentries`) — needs only a
+  `logbookToken` (readwrite). Payload uses `uuid`, `origin: 'auto'`, `category: 'radio'`.
+- **Fallback**: if `resourcesApi` is unavailable and `logbookUrl` is set, falls back to
+  the v1 REST API with Bearer + `JAUTHENTICATION` cookie (backward compat).
+- **Disabled by default in tests**: `logbookToken` empty in `mockApp()` → `shouldLogbook()`
+  returns false → no writes attempted.
+- **Errors**: logged via `app.error()` with the HTTP status or writer-missing reason.
+
 ## Key files
 
 ```
